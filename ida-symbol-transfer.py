@@ -20,6 +20,14 @@ class Function(dict):
         # Comments
         self['rep_cmt'] = self._rep_cmt = idc.GetFunctionCmt(ea, True)
         self['non_rep_cmt'] = self._non_rep_cmt = idc.GetFunctionCmt(ea, False)
+
+class Name(dict):
+    def __init__(self, ea, name):
+        # Address
+        self['addr'] = self._addr = ea
+
+        # Name
+        self['name'] = self._name = name
     
 
 def ExportFunctionsFromIDA(outfilename):

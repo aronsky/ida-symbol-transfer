@@ -52,9 +52,7 @@ def ExportNamesFromIDA(outfile):
 
     idc.Message("Exported {} names!\n".format(len(names)))
 
-def ImportFunctionsIntoIDA(infile):
-    functions = [obj for obj in pickle.load(infile) if obj is Function]
-
+def ImportFunctionsIntoIDA(functions):
     for function in functions:
         idc.MakeFunction(function._addr)
 
@@ -67,14 +65,12 @@ def ImportFunctionsIntoIDA(infile):
 
     idc.Message("Imported {} functions!\n".format(len(functions)))
 
-def ImportNamesIntoIDA(infile):
-    names = [obj for obj in pickle.load(infile) if obj is Name]
-
+def ImportNamesIntoIDA(names):
     for name in names:
         if not name._name.startswith("sub_") and not name._name.startswith("nullsub_"):
             idc.MakeName(function._addr, str(function._name))
 
-    idc.Message("Imported {} names!\n".format(len(functions)))
+    idc.Message("Imported {} names!\n".format(len(names)))
 
 def PrintFunctionsInR2Format(infilename):
     with open(infilename, "rb") as infile:
@@ -124,8 +120,9 @@ def ida_script_mode():
         idc.Message("Importing from {}...\n".format(infilename))
 
         with open(infilename, 'rb') as infile:
-            ImportFunctionsIntoIDA(infile)
-            ImportNamesIntoIDA(infile)
+            objects = pickle.load(infile)
+            ImportFunctionsIntoIDA(filter(lambda obj: type(obj) is Function, objects))
+            ImportNamesIntoIDA(filter(lambda obj: type(obj) is Name, objects))
 
 if __name__ == '__main__':
     try:

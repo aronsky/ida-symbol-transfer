@@ -41,11 +41,7 @@ def ExportFunctionsFromIDA(outfile):
 
     idc.Message("Exported {} functions!\n".format(len(functions)))
 
-def ExportNamesFromIDA(outfilename):
-    if not outfilename:
-        idc.Message("No file selected!\n")
-        return
-
+def ExportNamesFromIDA(outfile):
     names = [Name(addr, name) for addr, name in idautils.Names()]
 
     if not names:

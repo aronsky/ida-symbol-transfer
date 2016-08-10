@@ -68,11 +68,9 @@ def ImportFunctionsIntoIDA(infile):
     idc.Message("Imported {} functions!\n".format(len(functions)))
 
 def ImportNamesIntoIDA(infile):
-    name = [obj for obj in pickle.load(infile) if obj is Name]
+    names = [obj for obj in pickle.load(infile) if obj is Name]
 
-    for function in functions:
-        idc.MakeFunction(function._addr)
-
+    for name in names:
         if not name._name.startswith("sub_") and not name._name.startswith("nullsub_"):
             idc.MakeName(function._addr, str(function._name))
 

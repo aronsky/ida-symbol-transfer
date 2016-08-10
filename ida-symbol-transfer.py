@@ -30,34 +30,21 @@ class Name(dict):
         self['name'] = self._name = name
     
 
-def ExportFunctionsFromIDA(outfile):
-    functions = [Function(addr) for addr in idautils.Functions(MinEA(), MaxEA())]
+def GetFunctionsFromIDA():
+    return [Function(addr) for addr in idautils.Functions(MinEA(), MaxEA())]
 
-    if not functions:
-        idc.Message("No functions found!\n")
-        return
+def GetNamesFromIDA():
+    return [Name(addr, name) for addr, name in idautils.Names()]
 
-    pickle.dump(functions, outfile)
-
-    idc.Message("Exported {} functions!\n".format(len(functions)))
-
-def ExportNamesFromIDA(outfile):
-    names = [Name(addr, name) for addr, name in idautils.Names()]
-
-    if not names:
-        idc.Message("No names found!\n")
-        return
-
-    pickle.dump(names, outfile)
-
-    idc.Message("Exported {} names!\n".format(len(names)))
-
-def ImportFunctionsIntoIDA(functions):
+def PutFunctionsIntoIDA(functions):
     for function in functions:
         idc.MakeFunction(function._addr)
 
-        if not function._name.startswith("sub_") and not function._name.startswith("nullsub_"):
-            idc.MakeName(function._addr, str(function._name))
+        try:
+            if not function._name.startswith("sub_") and not function._name.startswith("nullsub_"):
+                idc.MakeName(function._addr, str(function._name))
+        except:
+            pass
 
         idc.SetFunctionFlags(function._addr, function._flags)
         idc.SetFunctionCmt(function._addr, str(function._rep_cmt), True)
@@ -65,10 +52,13 @@ def ImportFunctionsIntoIDA(functions):
 
     idc.Message("Imported {} functions!\n".format(len(functions)))
 
-def ImportNamesIntoIDA(names):
+def PutNamesIntoIDA(names):
     for name in names:
-        if not name._name.startswith("sub_") and not name._name.startswith("nullsub_"):
-            idc.MakeName(function._addr, str(function._name))
+        try:
+            if not name._name.startswith("sub_") and not name._name.startswith("nullsub_"):
+                idc.MakeName(name._addr, str(name._name))
+        except:
+            pass
 
     idc.Message("Imported {} names!\n".format(len(names)))
 
@@ -108,8 +98,10 @@ def ida_script_mode():
         idc.Message("Exporing to {}...\n".format(outfilename))
 
         with open(outfilename, 'wb') as outfile:
-            ExportFunctionsFromIDA(outfile)
-            ExportNamesFromIDA(outfile)
+            names = GetNamesFromIDA()
+            functions = GetFunctionsFromIDA()
+            pickle.dump(functions + names, outfile)
+            idc.Message("Exported {} functions and {} names!\n".format(len(functions), len(names)))
     elif 0 == userResponse:
         infilename = AskFile(0, "*.pkl;*.json", "Import functions from file...")
 
@@ -121,6 +113,7 @@ def ida_script_mode():
 
         with open(infilename, 'rb') as infile:
             objects = pickle.load(infile)
+            idc.Message("Loaded {} objects!\n".format(len(objects)))
             ImportFunctionsIntoIDA(filter(lambda obj: type(obj) is Function, objects))
             ImportNamesIntoIDA(filter(lambda obj: type(obj) is Name, objects))
 

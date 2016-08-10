@@ -50,7 +50,7 @@ def ExportNamesFromIDA(outfile):
 
     pickle.dump(names, outfile)
 
-    idc.Message("Exported {} names!".format(len(names)))
+    idc.Message("Exported {} names!\n".format(len(names)))
 
 def ImportFunctionsIntoIDA(infile):
     functions = [obj for obj in pickle.load(infile) if obj is Function]

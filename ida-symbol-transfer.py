@@ -125,7 +125,7 @@ def ida_script_mode():
 
         idc.Message("Importing from {}...\n".format(infilename))
 
-        with open(infilename, 'wb') as infile:
+        with open(infilename, 'rb') as infile:
             ImportFunctionsIntoIDA(infile)
             ImportNamesIntoIDA(infile)
 

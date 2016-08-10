@@ -6,20 +6,20 @@ import sys
 class Function(dict):
     def __init__(self, ea):
         # Address
-        self._addr = ea
+        self['addr'] = self._addr = ea
 
         # Name (if user-defined)
-        self._name = idc.GetFunctionName(ea)
+        self['name'] = self._name = idc.GetFunctionName(ea)
 
         # Function end
-        self._end = idc.GetFunctionAttr(ea, idc.FUNCATTR_END)
+        self['end'] = self._end = idc.GetFunctionAttr(ea, idc.FUNCATTR_END)
 
         # Flags
-        self._flags = idc.GetFunctionFlags(ea)
+        self['flags'] = self._flags = idc.GetFunctionFlags(ea)
 
         # Comments
-        self._rep_cmt = idc.GetFunctionCmt(ea, True)
-        self._non_rep_cmt = idc.GetFunctionCmt(ea, False)
+        self['rep_cmt'] = self._rep_cmt = idc.GetFunctionCmt(ea, True)
+        self['non_rep_cmt'] = self._non_rep_cmt = idc.GetFunctionCmt(ea, False)
     
 
 def ExportFunctionsFromIDA(outfilename):
